@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link href="/dist/output.css" rel="stylesheet" />
+		<title>HelpMeOut</title>
+	</head>
+	<body class="min-w-[300px]">
+		<main class="p-6 pb-8 font-workSans">
+			<header class="flex justify-between items-center mb-[18px]">
+				<div>
+					<img src="images/logo.svg" alt="logo" />
+				</div>
+				<div class="flex items-center space-x-3">
+					<div><img src="images/setting.svg" alt="setting" /></div>
+					<svg
+						width="20"
+						height="20"
+						viewBox="0 0 20 20"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						id="close_button"
+						class="transition-all duration-300 stroke-primary-100 hover:stroke-primary"
+					>
+						<path
+							d="M9.99984 18.3334C14.5832 18.3334 18.3332 14.5834 18.3332 10.0001C18.3332 5.41675 14.5832 1.66675 9.99984 1.66675C5.4165 1.66675 1.6665 5.41675 1.6665 10.0001C1.6665 14.5834 5.4165 18.3334 9.99984 18.3334Z"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M7.6416 12.3583L12.3583 7.6416"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+						<path
+							d="M12.3583 12.3583L7.6416 7.6416"
+							stroke-width="1.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</div>
+			</header>
+			<p class="mb-8 text-sm font-normal text-primary-400">
+				This extension helps you record and share help videos with ease.
+			</p>
+			<div class="space-y-6">
+				<div class="flex items-center justify-center space-x-6 text-sm">
+					<div
+						class="flex flex-col items-center space-y-2 screen text-primary-200"
+					>
+						<svg
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							class="stroke-primary-200"
+						>
+							<path
+								d="M8.5865 2.66675H23.3998C28.1465 2.66675 29.3332 3.85341 29.3332 8.58675V17.0267C29.3332 21.7734 28.1465 22.9467 23.4132 22.9467H8.5865C3.85317 22.9601 2.6665 21.7734 2.6665 17.0401V8.58675C2.6665 3.85341 3.85317 2.66675 8.5865 2.66675Z"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M16 22.96V29.3333"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M2.6665 17.3333H29.3332"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M10 29.3333H22"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+						<span class="font-medium">Full screen</span>
+					</div>
+					<div
+						class="flex flex-col items-center space-y-2 screen active text-primary-200"
+					>
+						<svg
+							width="32"
+							height="32"
+							viewBox="0 0 32 32"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							class="stroke-primary-200"
+						>
+							<path
+								d="M21.3332 17.2001V22.8001C21.3332 27.4667 19.4665 29.3334 14.7998 29.3334H9.19984C4.53317 29.3334 2.6665 27.4667 2.6665 22.8001V17.2001C2.6665 12.5334 4.53317 10.6667 9.19984 10.6667H14.7998C19.4665 10.6667 21.3332 12.5334 21.3332 17.2001Z"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+							<path
+								d="M29.3332 9.20008V14.8001C29.3332 19.4667 27.4665 21.3334 22.7998 21.3334H21.3332V17.2001C21.3332 12.5334 19.4665 10.6667 14.7998 10.6667H10.6665V9.20008C10.6665 4.53341 12.5332 2.66675 17.1998 2.66675H22.7998C27.4665 2.66675 29.3332 4.53341 29.3332 9.20008Z"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+						<span class="font-medium">Current Tab</span>
+					</div>
+				</div>
+
+				<div
+					class="flex items-center justify-between px-4 py-3 border border-primary-600 rounded-xl"
+				>
+					<div class="flex items-center space-x-2">
+						<div>
+							<img
+								src="images/video-camera.svg"
+								alt="video camera"
+							/>
+						</div>
+						<span class="text-sm font-medium text-primary-600">
+							Camera
+						</span>
+					</div>
+					<label class="relative inline-block h-5 w-9">
+						<input
+							class="w-0 h-0 opacity-0"
+							type="checkbox"
+							id="camera_toggle"
+							checked
+						/>
+						<span
+							class="absolute inset-0 transition-all duration-300 cursor-pointer slider rounded-xl bg-primary-200"
+						>
+							<span
+								class="absolute w-4 h-4 rounded-full bg-white left-[2px] bottom-[2px] transition-all duration-300"
+							></span>
+						</span>
+					</label>
+				</div>
+				<div
+					class="flex items-center justify-between px-4 py-3 border border-primary-600 rounded-xl"
+				>
+					<div class="flex items-center space-x-2">
+						<div>
+							<img src="images/microphone.svg" alt="microphone" />
+						</div>
+						<span class="text-sm font-medium text-primary-600">
+							Audio
+						</span>
+					</div>
+					<label class="relative inline-block h-5 w-9">
+						<input
+							class="w-0 h-0 opacity-0"
+							type="checkbox"
+							id="audio_toggle"
+							checked
+						/>
+						<span
+							class="absolute inset-0 transition-all duration-300 cursor-pointer slider rounded-xl bg-primary-200"
+						>
+							<span
+								class="absolute w-4 h-4 rounded-full bg-white left-[2px] bottom-[2px] transition-all duration-300"
+							></span>
+						</span>
+					</label>
+				</div>
+
+				<button
+					id="start_recording"
+					class="w-full p-4 text-white cursor-pointer rounded-xl bg-primary hover:bg-primary/75"
+					>Start Recording</button
+				>
+			</div>
+		</main>
+		<script src="./js/popup.js"></script>
+	</body>
+</html>
