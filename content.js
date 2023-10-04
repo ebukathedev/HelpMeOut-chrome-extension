@@ -1,24 +1,315 @@
-// content scripts has been injected
 console.log("Injected!!!");
 
-const fetchBlob = async (url) => {
-	const response = await fetch(url);
-	const blob = await response.blob();
-	const base64 = await convertBlobToBase64(blob);
+const styles = `
+ <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500&family=Work+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  <style>
+      body {
+        font-family: "Work Sans", sans-serif;
+      }
+      .container {
+        box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.1);
+      }
+      .controls_container {
+        position: fixed;
+        padding: 20px 40px;
+        bottom: 0;
+        left: 0;
+        z-index:9999999999999999;
+      }
+      .controls_wrapper {
+        border-radius: 999px;
+        padding: 8px;
+        background-color: rgba(98, 98, 98, 0.17);
+      }
+      .controls_main {
+        background-color: #141414;
+        padding: 12px 16px;
+        padding-right: 20px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      .controls_timer {
+        font-family: "Inter" sans-serif;
+        font-weight: 500;
+        font-size: 20px;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 16px;
+        border-right: 1px solid #e8e8e8;
+      }
+      .recording_indicator {
+        background-color: rgba(192, 4, 4, 19%);
+        border-radius: 999px;
+        padding: 6px;
+      }
+      .recording_indicator > span {
+        background-color: rgb(192, 4, 4);
+        width: 10px;
+        height: 10px;
+        display: block;
+        border-radius: 999px;
+      }
+      .controls_actions_wrapper {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      .controls_actions {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        color: #fff;
+        font-size: 12px;
+      }
+      .controls_actions-img {
+        border-radius: 999px;
+        background-color: #fff;
+        display: flex;
+        border: black solid 1px;
+        place-content: center;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        position: relative;
+      }
+      .controls-actions-img > svg {
+        width:24px;
+        height:24px;
+      }
+      .controls_arrow-up {
+        position: absolute;
+        padding: 2px;
+        background-color: #fff;
+        bottom: -2px;
+        right: -2px;
+        border-radius: 2px;
+        box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+      }
+      .controls_delete {
+        background-color: #4b4b4b;
+        align-self: flex-start;
+        gap: 0;
+        flex-direction: row;
+      }
+    </style>
+`;
 
-	return base64;
-};
+const markup = `
+	<section class="controls_container" id="controls">
+      <div class="controls_wrapper">
+        <div class="controls_main">
+          <div class="controls_timer">
+            <span>00:04:35</span>
+            <div class="recording_indicator">
+              <span></span>
+            </div>
+          </div>
+          <div class="controls_actions_wrapper" >
+            <div class="controls_actions" >
+              <div class="controls_actions-img">
+                <svg width="10" height="14" viewBox="0 0 10 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M1 1.5L1 12.5" stroke="black" stroke-width="2" stroke-linecap="round"/>
+<path d="M9 1.5L9 12.5" stroke="black" stroke-width="2" stroke-linecap="round"/>
+</svg>
+              </div>
+              <span id="pause-text">Pause</span>
+            </div>
+            <div class="controls_actions" id='stop'>
+              <div class="controls_actions-img">
+               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+<path d="M5.25 7.5C5.25 6.25736 6.25736 5.25 7.5 5.25H16.5C17.7426 5.25 18.75 6.25736 18.75 7.5V16.5C18.75 17.7426 17.7426 18.75 16.5 18.75H7.5C6.25736 18.75 5.25 17.7426 5.25 16.5V7.5Z" stroke="#0F172A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+              </div>
+              <span>Stop</span>
+            </div>
+            <div class="controls_actions">
+              <div class="controls_actions-img">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g id="vuesax/linear/video-slash">
+                    <g id="video-slash">
+                      <path
+                        id="Vector"
+                        d="M16.63 7.58008C16.63 7.58008 16.66 6.63008 16.63 6.32008C16.46 4.28008 15.13 3.58008 12.52 3.58008H6.21C3.05 3.58008 2 4.63008 2 7.79008V16.2101C2 17.4701 2.38 18.7401 3.37 19.5501L4 20.0001"
+                        stroke="#292D32"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        id="Vector_2"
+                        d="M16.7398 10.95V16.21C16.7398 19.37 15.6898 20.42 12.5298 20.42H7.25977"
+                        stroke="#292D32"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        id="Vector_3"
+                        d="M22.0002 6.73999V15.81C22.0002 17.48 20.8802 18.06 19.5202 17.1L16.7402 15.15"
+                        stroke="#292D32"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        id="Vector_4"
+                        d="M22.02 2.18994L2.02002 22.1899"
+                        stroke="#292D32"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </g>
+                  </g>
+                </svg>
 
-const convertBlobToBase64 = (blob) => {
-	return new Promise((resolve) => {
-		const reader = new FileReader();
-		reader.readAsDataURL(blob);
-		reader.onloadend = () => {
-			const base64data = reader.result;
+                <div class="controls_arrow-up">
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g id="vuesax/linear/arrow-up">
+                      <g id="arrow-up">
+                        <path
+                          id="Vector"
+                          d="M6.63986 5.01671L4.46653 2.84338C4.20986 2.58671 3.78986 2.58671 3.5332 2.84338L1.35986 5.01671"
+                          stroke="black"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </g>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+              <span>Camera</span>
+            </div>
+            <div class="controls_actions">
+              <div class="controls_actions-img">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <g id="heroicons-outline/microphone">
+                    <path
+                      id="Vector"
+                      d="M12 18.75C15.3137 18.75 18 16.0637 18 12.75V11.25M12 18.75C8.68629 18.75 6 16.0637 6 12.75V11.25M12 18.75V22.5M8.25 22.5H15.75M12 15.75C10.3431 15.75 9 14.4069 9 12.75V4.5C9 2.84315 10.3431 1.5 12 1.5C13.6569 1.5 15 2.84315 15 4.5V12.75C15 14.4069 13.6569 15.75 12 15.75Z"
+                      stroke="#0F172A"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </g>
+                </svg>
 
-			resolve(base64data);
-		};
-	});
+                <div class="controls_arrow-up">
+                  <svg
+                    width="8"
+                    height="8"
+                    viewBox="0 0 8 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <g id="vuesax/linear/arrow-up">
+                      <g id="arrow-up">
+                        <path
+                          id="Vector"
+                          d="M6.63986 5.01671L4.46653 2.84338C4.20986 2.58671 3.78986 2.58671 3.5332 2.84338L1.35986 5.01671"
+                          stroke="black"
+                          stroke-miterlimit="10"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </g>
+                    </g>
+                  </svg>
+                </div>
+              </div>
+              <span>Mic</span>
+            </div>
+            <div class="controls_actions-img controls_delete">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <g id="heroicons-outline/trash">
+                  <path
+                    id="Vector"
+                    d="M14.7404 9L14.3942 18M9.60577 18L9.25962 9M19.2276 5.79057C19.5696 5.84221 19.9104 5.89747 20.25 5.95629M19.2276 5.79057L18.1598 19.6726C18.0696 20.8448 17.0921 21.75 15.9164 21.75H8.08357C6.90786 21.75 5.93037 20.8448 5.8402 19.6726L4.77235 5.79057M19.2276 5.79057C18.0812 5.61744 16.9215 5.48485 15.75 5.39432M3.75 5.95629C4.08957 5.89747 4.43037 5.84221 4.77235 5.79057M4.77235 5.79057C5.91878 5.61744 7.07849 5.48485 8.25 5.39432M15.75 5.39432V4.47819C15.75 3.29882 14.8393 2.31423 13.6606 2.27652C13.1092 2.25889 12.5556 2.25 12 2.25C11.4444 2.25 10.8908 2.25889 10.3394 2.27652C9.16065 2.31423 8.25 3.29882 8.25 4.47819V5.39432M15.75 5.39432C14.5126 5.2987 13.262 5.25 12 5.25C10.738 5.25 9.48744 5.2987 8.25 5.39432"
+                    stroke="#BEBEBE"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+`;
+
+const script = `
+<script>
+	const stopVideoButton = document.querySelector("#stop")
+	console.log("stop);
+		stopVideoButton.addEventListener("click", () => {
+			chrome.tabs.query(
+				{ active: true, currentWindow: true },
+				function (tabs) {
+					chrome.tabs.sendMessage(
+						tabs[0].id,
+						{ action: "stop_video" },
+						function (response) {
+							if (!chrome.runtime.lastError) {
+								console.log(response);
+							} else {
+								console.log(
+									chrome.runtime.lastError,
+									"error line 27"
+								);
+							}
+						}
+					);
+				}
+			);
+		});
+	
+	</script>
+`;
+const injectControls = () => {
+	document.head.insertAdjacentHTML("beforeend", styles);
+	document.body.insertAdjacentHTML("beforeend", markup);
+	document.body.insertAdjacentHTML("beforeend", script);
 };
 
 // the object responsible fo recording the screen
@@ -55,42 +346,7 @@ const onAccessApproved = (stream) => {
 		document.body.removeChild(a);
 
 		URL.revokeObjectURL(url);
-
-		// if (event.data.size > 0) {
-		// 	const blobFile = new Blob(event.data, { type: "video/webm" });
-		// 	const base64 = await fetchBlob(URL.createObjectURL(blobFile));
-
-		// 	// if we actually have a video, send it to the backend after it has been converted to a blob
-		// 	sendChunkToBackend(base64);
-		// }
 	};
-};
-
-const sendChunkToBackend = (chunkData) => {
-	console.log("video", chunkData);
-
-	// const backendEndpoint = "";
-
-	// fetch(backendEndpoint, {
-	// 	method: "POST",
-	// 	body: JSON.stringify({ chunkData }), // Send the chunk data in the request body
-	// 	headers: {
-	// 		"Content-Type": "application/json", // Adjust the content type as needed
-	// 	},
-	// })
-	// 	.then((response) => {
-	// 		if (!response.ok) {
-	// 			throw new Error("Network response was not ok");
-	// 		}
-	// 		return response.json(); // Parse the response if it's JSON
-	// 	})
-	// 	.then((data) => {
-	// 		// Handle the response from the backend as needed
-	// 		console.log("Backend Response:", data);
-	// 	})
-	// 	.catch((error) => {
-	// 		console.error("Error sending chunk to the backend:", error);
-	// 	});
 };
 
 // listens for when the record button is click and a recording request is sent
@@ -98,6 +354,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	if (message.action === "request_recording") {
 		console.log("requesting recording...");
 		sendResponse(`processed ${message.action}`);
+		injectControls();
 
 		navigator.mediaDevices
 			.getDisplayMedia({
@@ -110,5 +367,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			.then((stream) => {
 				onAccessApproved(stream);
 			});
+	}
+
+	if (message.action === "stopvideo") {
+		console.log("video");
+		sendResponse(`processed: ${message.action}`);
+		if (!recorder) {
+			console.log("no recorder");
+		}
+
+		recorder.stop();
 	}
 });
